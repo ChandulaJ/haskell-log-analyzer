@@ -25,7 +25,7 @@ IP - - [timestamp] "METHOD path HTTP/version" status size "referer" "user-agent"
 ```
 
 
-## Overview
+## Parser Module Overview With Data Types
 The Parser module processes Apache/Nginx Combined Log Format entries and converts them into structured Haskell data types for analysis.
 
 ## Input Format
