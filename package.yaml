@@ -1,0 +1,52 @@
+name:                server-log-analyzer
+version:             0.1.0.0
+github:              "ChandulaJ/haskell-log-analyzer"
+license:             BSD3
+author:              "Your Name"
+maintainer:          "your.email@example.com"
+copyright:           "2025 Your Name"
+
+extra-source-files:
+- README.md
+
+description:         A server log analyzer written in Haskell
+
+dependencies:
+- base >= 4.7 && < 5
+
+ghc-options:
+- -Wall
+- -Wcompat
+- -Widentities
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wmissing-export-lists
+- -Wmissing-home-modules
+- -Wpartial-fields
+- -Wredundant-constraints
+
+library:
+  source-dirs: src
+
+executables:
+  server-log-analyzer-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - server-log-analyzer
+
+tests:
+  server-log-analyzer-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - server-log-analyzer
+    - hspec
