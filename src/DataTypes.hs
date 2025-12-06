@@ -1,4 +1,13 @@
-module DataTypes where
+module DataTypes 
+  ( LogEntry(..)
+  , HttpMethod(..)
+  , LogStats(..)
+  , TimeWindow(..)
+  , StatusCategory(..)
+  , BotType(..)
+  , statusCategory
+  , isError
+  ) where
 
 import Data.Time (UTCTime)
 -- Data types for log analyzer

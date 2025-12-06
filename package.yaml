@@ -13,6 +13,11 @@ description:         A server log analyzer written in Haskell
 
 dependencies:
 - base >= 4.7 && < 5
+- time
+- regex-tdfa
+- text
+- split
+- bytestring
 
 ghc-options:
 - -Wall

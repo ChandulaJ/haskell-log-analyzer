@@ -1,0 +1,82 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.37.0.
+--
+-- see: https://github.com/sol/hpack
+
+name:           server-log-analyzer
+version:        0.1.0.0
+description:    A server log analyzer written in Haskell
+homepage:       https://github.com/ChandulaJ/haskell-log-analyzer#readme
+bug-reports:    https://github.com/ChandulaJ/haskell-log-analyzer/issues
+author:         Your Name
+maintainer:     your.email@example.com
+copyright:      2025 Your Name
+license:        BSD3
+build-type:     Simple
+extra-source-files:
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/ChandulaJ/haskell-log-analyzer
+
+library
+  exposed-modules:
+      DataTypes
+      IOHandler
+      Parser
+      Processing
+      Utils
+  other-modules:
+      Paths_server_log_analyzer
+  hs-source-dirs:
+      src
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  build-depends:
+      base >=4.7 && <5
+    , bytestring
+    , regex-tdfa
+    , split
+    , text
+    , time
+  default-language: Haskell2010
+
+executable server-log-analyzer-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_server_log_analyzer
+  hs-source-dirs:
+      app
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , bytestring
+    , regex-tdfa
+    , server-log-analyzer
+    , split
+    , text
+    , time
+  default-language: Haskell2010
+
+test-suite server-log-analyzer-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      ParserSpec
+      ProcessingSpec
+      UtilsSpec
+      Paths_server_log_analyzer
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , bytestring
+    , hspec
+    , regex-tdfa
+    , server-log-analyzer
+    , split
+    , text
+    , time
+  default-language: Haskell2010
