@@ -36,6 +36,9 @@ library
   build-depends:
       base >=4.7 && <5
     , bytestring
+    , containers
+    , deepseq
+    , parallel
     , regex-tdfa
     , split
     , text
@@ -52,6 +55,9 @@ executable server-log-analyzer-exe
   build-depends:
       base >=4.7 && <5
     , bytestring
+    , containers
+    , deepseq
+    , parallel
     , regex-tdfa
     , server-log-analyzer
     , split
@@ -73,7 +79,10 @@ test-suite server-log-analyzer-test
   build-depends:
       base >=4.7 && <5
     , bytestring
+    , containers
+    , deepseq
     , hspec
+    , parallel
     , regex-tdfa
     , server-log-analyzer
     , split
