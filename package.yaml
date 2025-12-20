@@ -39,7 +39,7 @@ library:
 executables:
   server-log-analyzer-exe:
     main:                Main.hs
-    source-dirs:         app
+    source-dirs:         src
     ghc-options:
     - -threaded
     - -rtsopts
@@ -58,3 +58,5 @@ tests:
     dependencies:
     - server-log-analyzer
     - hspec
+    - QuickCheck
+    - hspec-discover

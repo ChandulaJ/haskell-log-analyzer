@@ -12,28 +12,18 @@ module Processing
   , sessionize
   , computeAnomalies
   , processLogs
-  , bucketTime
   ) where
 
--- UPDATED IMPORT: Added foldl', isPrefixOf, etc.
-import Data.List (sortOn, sortBy, foldl', isPrefixOf, tails)
+import Data.List (sortOn, sortBy)
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as M
 import Data.Ord (Down(..), comparing)
 import Data.Time (UTCTime, NominalDiffTime, diffUTCTime)
-import Data.Time.Clock.POSIX (utcTimeToPOSIXSeconds, posixSecondsToUTCTime)
 import Control.Parallel.Strategies (using, rseq, parBuffer)
 import Control.DeepSeq (NFData(..))
 
 import DataTypes (LogEntry(..), isError, StatusCategory(..), statusCategory)
-
--- | NFData instance for parallel evaluation of StatusCategory
-instance NFData StatusCategory where
-  rnf Success     = ()
-  rnf Redirection = ()
-  rnf ClientError = ()
-  rnf ServerError = ()
-  rnf Other       = ()
+import Utils (bucketTime)
 
 -- | Result of log analysis combining multiple metrics
 data AnalysisResult = AnalysisResult
@@ -48,23 +38,7 @@ instance NFData AnalysisResult where
   rnf (AnalysisResult t bl ti et) = 
     rnf t `seq` rnf (M.toList bl) `seq` rnf ti `seq` rnf et
 
---------------------------------------------------------------------------------
--- Helper Functions
---------------------------------------------------------------------------------
-
--- | Bucket a timestamp to the nearest interval boundary (rounding down)
--- 
--- Example: With a 1-hour interval, 14:37:22 becomes 14:00:00
-bucketTime :: NominalDiffTime -> UTCTime -> UTCTime
-bucketTime interval time =
-  let posixTime = utcTimeToPOSIXSeconds time
-      intervalSecs = realToFrac interval :: Double
-      bucketNum = floor (realToFrac posixTime / intervalSecs) :: Integer
-  in posixSecondsToUTCTime (fromIntegral bucketNum * interval)
-
---------------------------------------------------------------------------------
 -- Core Analysis Functions
---------------------------------------------------------------------------------
 
 -- | Count occurrences of each status category
 -- Uses strict fold for memory efficiency

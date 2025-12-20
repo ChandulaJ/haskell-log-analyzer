@@ -3,7 +3,7 @@ module IOHandler
   , writeReport
   ) where
 
-import System.IO
+import System.IO ()
 import Control.Exception (catch) -- <--- CHANGED: Removed IOError
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as M
