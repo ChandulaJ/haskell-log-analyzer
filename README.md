@@ -131,6 +131,10 @@ No specific anomalies detected.
 ```
 
 ---
+## Architecture
+
+![System Architecture](docs/Architecture.png)
+
 
 ## Project Structure
 
