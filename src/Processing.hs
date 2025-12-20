@@ -17,7 +17,8 @@ module Processing
   , bucketTime
   ) where
 
-import Data.List (sortOn, sortBy)
+-- UPDATED IMPORT: Added foldl', isPrefixOf, etc.
+import Data.List (sortOn, sortBy, foldl', isPrefixOf, tails)
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as M
 import Data.Ord (Down(..), comparing)
