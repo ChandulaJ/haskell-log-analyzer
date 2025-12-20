@@ -10,8 +10,8 @@
 
 ### Group Members
 - EG/2020/3990 - Jayasooriya LPM
-- EG/2020/3994 - Jayathilaka HACP
-- EG/2020/3996 - Jayawardena MVTI
+- EG/2020/3994 - Jayathilake HACP
+- EG/2020/3996 - Jayawardhana MVTI
 - EG/2020/4040 - Lakpahana AGS
 
 ---
@@ -370,24 +370,12 @@ Core libraries used:
 
 ---
 
-## Future Extensions
-
-1. **Real-time Streaming:** Process live log streams using FRP (Functional Reactive Programming)
-2. **Machine Learning:** Integrate anomaly detection models for predictive analytics
-3. **Distributed Processing:** Extend to MapReduce-style distributed computation
-4. **Visualization:** Generate charts and dashboards from analysis results
-5. **Multiple Formats:** Support Nginx, IIS, and custom log formats
-6. **Database Integration:** Store processed results in PostgreSQL for querying
-7. **RESTful API:** Expose analysis capabilities as a web service
-
----
-
 ## Additional Resources
 
 - **Haskell Documentation:** [haskell.org](https://www.haskell.org/)
 - **Learn You a Haskell:** [learnyouahaskell.com](http://learnyouahaskell.com/)
-- **Real World Haskell:** [book.realworldhaskell.org](http://book.realworldhaskell.org/)
 - **Apache Log Format:** [httpd.apache.org/docs/current/logs.html](https://httpd.apache.org/docs/current/logs.html)
+- **DataSet:** [web-server-access-logs](https://www.kaggle.com/datasets/eliasdabbas/web-server-access-logs)
 
 ---
 
