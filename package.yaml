@@ -18,6 +18,9 @@ dependencies:
 - text
 - split
 - bytestring
+- containers
+- parallel
+- deepseq
 
 ghc-options:
 - -Wall
