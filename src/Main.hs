@@ -4,7 +4,6 @@ import System.Environment (getArgs)
 import System.IO (hFlush, stdout)
 
 -- Import local modules
-import DataTypes
 import Parser
 import Processing
 import IOHandler

@@ -16,7 +16,7 @@ module Processing
   ) where
 
 -- UPDATED IMPORT: Added foldl', isPrefixOf, etc.
-import Data.List (sortOn, sortBy, foldl', isPrefixOf, tails)
+import Data.List (sortOn, sortBy)
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as M
 import Data.Ord (Down(..), comparing)
@@ -26,14 +26,6 @@ import Control.Parallel.Strategies (using, rseq, parBuffer)
 import Control.DeepSeq (NFData(..))
 
 import DataTypes (LogEntry(..), isError, StatusCategory(..), statusCategory)
-
--- | NFData instance for parallel evaluation of StatusCategory
-instance NFData StatusCategory where
-  rnf Success     = ()
-  rnf Redirection = ()
-  rnf ClientError = ()
-  rnf ServerError = ()
-  rnf Other       = ()
 
 -- | Result of log analysis combining multiple metrics
 data AnalysisResult = AnalysisResult

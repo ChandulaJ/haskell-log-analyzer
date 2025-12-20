@@ -44,11 +44,11 @@ module Utils
 
 import Data.Time (UTCTime, NominalDiffTime, diffUTCTime, formatTime, defaultTimeLocale)
 import Data.Time.Clock.POSIX (utcTimeToPOSIXSeconds, posixSecondsToUTCTime)
-import Data.List (sort, intercalate, foldl')
+import Data.List (sort, intercalate)
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as M
 import Text.Printf (printf)
-import Numeric (showFFloat)
+
 
 --------------------------------------------------------------------------------
 -- Time Utilities
@@ -115,9 +115,9 @@ bucketTimeToDay time =
 formatBytes :: Integer -> String
 formatBytes bytes
   | bytes < 1024 = show bytes ++ " B"
-  | bytes < 1024^2 = printf "%.2f KB" (fromIntegral bytes / 1024 :: Double)
-  | bytes < 1024^3 = printf "%.2f MB" (fromIntegral bytes / 1024^2 :: Double)
-  | otherwise = printf "%.2f GB" (fromIntegral bytes / 1024^3 :: Double)
+  | bytes < 1024^(2::Integer) = printf "%.2f KB" (fromIntegral bytes / 1024 :: Double)
+  | bytes < 1024^(3::Integer) = printf "%.2f MB" (fromIntegral bytes / (1024^(2::Integer)) :: Double)
+  | otherwise = printf "%.2f GB" (fromIntegral bytes / (1024^(3::Integer)) :: Double)
 
 -- | Format a ratio as a percentage
 -- Example: 0.7523 -> "75.23%"
@@ -252,7 +252,7 @@ standardDeviation :: [Double] -> Double
 standardDeviation [] = 0
 standardDeviation xs =
   let avg = average xs
-      squaredDiffs = map (\x -> (x - avg) ^ 2) xs
+      squaredDiffs = map (\x -> (x - avg) ^ (2::Integer)) xs
       variance = average squaredDiffs
   in sqrt variance
 
