@@ -2,8 +2,7 @@ module UtilsSpec (spec) where
 
 import Test.Hspec
 import Utils (bucketTime)
-import Data.Time (UTCTime, parseTimeM, defaultTimeLocale)
-import Data.Maybe (fromJust)
+import TestHelpers (parseTime, formatTime)
 
 spec :: Spec
 spec = do
@@ -21,11 +20,3 @@ spec = do
         let hourInterval = 3600
         let bucketed = bucketTime hourInterval time
         bucketed `shouldBe` time
-
--- Helper function to parse time for tests
-parseTime :: String -> UTCTime
-parseTime = fromJust . parseTimeM True defaultTimeLocale "%Y-%m-%d %H:%M:%S"
-
--- Helper function to format time
-formatTime :: UTCTime -> String
-formatTime = show
