@@ -8,6 +8,7 @@ module Utils
   , formatDuration
   , bucketTimeToHour
   , bucketTimeToDay
+  , bucketTime
   
   -- * Pretty Formatters
   , formatBytes
@@ -105,6 +106,17 @@ bucketTimeToDay time =
       dayInSeconds = 86400 :: NominalDiffTime
       bucketNum = floor (posixTime / dayInSeconds) :: Integer
   in posixSecondsToUTCTime (fromIntegral bucketNum * dayInSeconds)
+
+-- | Bucket a timestamp to the nearest interval boundary (rounding down)
+-- 
+-- Example: With a 1-hour interval, 14:37:22 becomes 14:00:00
+-- This is a general-purpose function that can bucket to any interval
+bucketTime :: NominalDiffTime -> UTCTime -> UTCTime
+bucketTime interval time =
+  let posixTime = utcTimeToPOSIXSeconds time
+      intervalSecs = realToFrac interval :: Double
+      bucketNum = floor (realToFrac posixTime / intervalSecs) :: Integer
+  in posixSecondsToUTCTime (fromIntegral bucketNum * interval)
 
 --------------------------------------------------------------------------------
 -- Pretty Formatters
