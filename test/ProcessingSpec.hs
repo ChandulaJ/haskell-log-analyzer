@@ -1,4 +1,4 @@
-module ProcessingSpec where
+module ProcessingSpec (spec) where
 
 import Test.Hspec
 import Test.QuickCheck
@@ -7,7 +7,7 @@ import DataTypes
 import Data.Time (UTCTime, parseTimeM, defaultTimeLocale)
 import Data.Maybe (fromJust)
 import qualified Data.Map.Strict as M
-import qualified Data.List
+import Utils (bucketTime)
 
 spec :: Spec
 spec = do
@@ -50,7 +50,7 @@ spec = do
         tops `shouldBe` [("192.168.1.1", 3), ("192.168.1.2", 2)]
       
       it "limits results to N entries" $ do
-        let entries = map mockEntryWithIP (map show [1..10])
+        let entries = map mockEntryWithIP (map show ([1..10] :: [Integer]))
         let tops = topIPs 5 entries
         length tops `shouldBe` 5
       
@@ -209,9 +209,9 @@ spec = do
               isSorted (x:y:rest) = x >= y && isSorted (y:rest)
           in isSorted counts
 
---------------------------------------------------------------------------------
+
 -- Helper Functions for Creating Mock Data
---------------------------------------------------------------------------------
+
 
 -- | Create a mock LogEntry with specific status code
 mockEntry :: Int -> LogEntry

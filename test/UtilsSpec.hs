@@ -1,4 +1,4 @@
-module UtilsSpec where
+module UtilsSpec (spec) where
 
 import Test.Hspec
 import Test.QuickCheck
@@ -103,40 +103,40 @@ spec = do
   describe "List Utilities" $ do
     describe "safeHead" $ do
       it "returns Just for non-empty list" $ do
-        safeHead [1, 2, 3] `shouldBe` Just 1
+        safeHead ([1, 2, 3] :: [Integer]) `shouldBe` Just 1
       
       it "returns Nothing for empty list" $ do
         safeHead ([] :: [Int]) `shouldBe` Nothing
       
       it "is safe (QuickCheck property)" $ property $
-        \xs -> safeHead (xs :: [Int]) == if null xs then Nothing else Just (head xs)
+        \xs -> safeHead (xs :: [Int]) == (if null xs then Nothing else Just (xs !! 0))
     
     describe "safeTail" $ do
       it "returns tail for non-empty list" $ do
-        safeTail [1, 2, 3] `shouldBe` [2, 3]
+        safeTail ([1, 2, 3] :: [Integer]) `shouldBe` [2, 3]
       
       it "returns empty list for empty input" $ do
         safeTail ([] :: [Int]) `shouldBe` []
       
       it "is safe (QuickCheck property)" $ property $
-        \xs -> safeTail (xs :: [Int]) == if null xs then [] else tail xs
+        \xs -> safeTail (xs :: [Int]) == (if null xs then [] else drop 1 xs)
     
     describe "safeLast" $ do
       it "returns Just for non-empty list" $ do
-        safeLast [1, 2, 3] `shouldBe` Just 3
+        safeLast ([1, 2, 3] :: [Integer]) `shouldBe` Just 3
       
       it "returns Nothing for empty list" $ do
         safeLast ([] :: [Int]) `shouldBe` Nothing
     
     describe "chunksOf" $ do
       it "splits list into chunks" $ do
-        chunksOf 3 [1..7] `shouldBe` [[1,2,3], [4,5,6], [7]]
+        chunksOf 3 ([1..7] :: [Integer]) `shouldBe` [[1,2,3], [4,5,6], [7]]
       
       it "handles empty list" $ do
         chunksOf 3 ([] :: [Int]) `shouldBe` []
       
       it "handles chunk size larger than list" $ do
-        chunksOf 10 [1,2,3] `shouldBe` [[1,2,3]]
+        chunksOf 10 ([1,2,3] :: [Integer]) `shouldBe` [[1,2,3]]
       
       it "preserves all elements (QuickCheck property)" $ property $
         \n xs -> n > 0 ==> concat (chunksOf n (xs :: [Int])) == xs

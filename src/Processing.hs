@@ -14,13 +14,11 @@ module Processing
   , processLogs
   ) where
 
--- UPDATED IMPORT: Added foldl', isPrefixOf, etc.
 import Data.List (sortOn, sortBy)
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as M
 import Data.Ord (Down(..), comparing)
 import Data.Time (UTCTime, NominalDiffTime, diffUTCTime)
-import Data.Time.Clock.POSIX (utcTimeToPOSIXSeconds, posixSecondsToUTCTime)
 import Control.Parallel.Strategies (using, rseq, parBuffer)
 import Control.DeepSeq (NFData(..))
 

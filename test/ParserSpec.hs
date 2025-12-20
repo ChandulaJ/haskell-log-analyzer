@@ -1,10 +1,9 @@
-module ParserSpec where
+module ParserSpec (spec) where
 
 import Test.Hspec
 import Test.QuickCheck
 import Parser
 import DataTypes
-import Data.Time (UTCTime)
 import Data.Maybe (isJust, isNothing)
 
 spec :: Spec

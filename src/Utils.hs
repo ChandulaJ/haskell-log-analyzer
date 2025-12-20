@@ -50,10 +50,7 @@ import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as M
 import Text.Printf (printf)
 
-
---------------------------------------------------------------------------------
 -- Time Utilities
---------------------------------------------------------------------------------
 
 -- | Format a UTCTime to a human-readable string
 -- Example: "2019-01-22 03:56:14 UTC"
@@ -118,9 +115,7 @@ bucketTime interval time =
       bucketNum = floor (realToFrac posixTime / intervalSecs) :: Integer
   in posixSecondsToUTCTime (fromIntegral bucketNum * interval)
 
---------------------------------------------------------------------------------
 -- Pretty Formatters
---------------------------------------------------------------------------------
 
 -- | Format bytes to human-readable size (KB, MB, GB, etc.)
 -- Example: 1536 -> "1.50 KB"
@@ -159,9 +154,7 @@ colorizeStatus code
   | code >= 400 = "\ESC[31m" ++ show code ++ "\ESC[0m"  -- Red
   | otherwise = show code
 
---------------------------------------------------------------------------------
 -- CSV/JSON Helpers
---------------------------------------------------------------------------------
 
 -- | Convert a list of strings to a CSV row
 -- Example: ["Alice", "25", "Engineer"] -> "Alice,25,Engineer"
@@ -197,9 +190,7 @@ escapeJSON = concatMap escape
     escape '\t' = "\\t"
     escape c = [c]
 
---------------------------------------------------------------------------------
 -- List Utilities
---------------------------------------------------------------------------------
 
 -- | Safe head that returns Maybe instead of throwing on empty list
 safeHead :: [a] -> Maybe a
@@ -229,9 +220,7 @@ groupByKey keyFn = foldl' addToGroup M.empty
   where
     addToGroup acc item = M.insertWith (++) (keyFn item) [item] acc
 
---------------------------------------------------------------------------------
 -- Statistical Helpers
---------------------------------------------------------------------------------
 
 -- | Calculate the average of a list of numbers
 average :: [Double] -> Double
@@ -268,9 +257,7 @@ standardDeviation xs =
       variance = average squaredDiffs
   in sqrt variance
 
---------------------------------------------------------------------------------
 -- String Utilities
---------------------------------------------------------------------------------
 
 -- | Truncate a string to maximum length with ellipsis
 -- Example: truncate' 10 "Hello World!" -> "Hello Wo..."
