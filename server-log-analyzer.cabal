@@ -25,6 +25,7 @@ library
   exposed-modules:
       DataTypes
       IOHandler
+      Main
       Parser
       Processing
       Utils
@@ -48,9 +49,14 @@ library
 executable server-log-analyzer-exe
   main-is: Main.hs
   other-modules:
+      DataTypes
+      IOHandler
+      Parser
+      Processing
+      Utils
       Paths_server_log_analyzer
   hs-source-dirs:
-      app
+      src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
@@ -77,11 +83,13 @@ test-suite server-log-analyzer-test
       test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      QuickCheck
+    , base >=4.7 && <5
     , bytestring
     , containers
     , deepseq
     , hspec
+    , hspec-discover
     , parallel
     , regex-tdfa
     , server-log-analyzer
