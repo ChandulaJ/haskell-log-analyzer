@@ -2,9 +2,8 @@
 {-# LANGUAGE BangPatterns #-}
 
 module Processing 
-  ( -- * Data Types
+  (
     AnalysisResult(..)
-    -- * Core Analysis Functions
   , countByLevel
   , topIPs
   , filterByService
@@ -13,7 +12,6 @@ module Processing
   , sessionize
   , computeAnomalies
   , processLogs
-    -- * Helper Functions
   , bucketTime
   ) where
 
@@ -78,9 +76,6 @@ countByLevel = foldl' countEntry M.empty
       in M.insertWith (+) category 1 acc
 
 -- | Return the top N IPs sorted by descending request count
--- 
--- >>> topIPs 5 entries
--- [("192.168.1.1", 150), ("10.0.0.1", 120), ...]
 topIPs :: Int -> [LogEntry] -> [(String, Int)]
 topIPs n entries =
   take n
@@ -94,8 +89,6 @@ topIPs n entries =
     countIP !acc entry = M.insertWith (+) (leIpAddress entry) 1 acc
 
 -- | Filter entries by path prefix (case-insensitive)
--- Since the original LogEntry doesn't have a service field,
--- we use the path as a proxy for service filtering
 filterByService :: String -> [LogEntry] -> [LogEntry]
 filterByService servicePath = filter matchesService
   where
@@ -115,10 +108,6 @@ filterByService servicePath = filter matchesService
       | otherwise = c
 
 -- | Generic aggregator for counting endpoints extracted by a function
--- The extractor function returns Nothing for entries to skip
--- 
--- >>> requestsPerEndpoint (Just . lePath) entries
--- Map from path to count
 requestsPerEndpoint :: (LogEntry -> Maybe String) -> [LogEntry] -> Map String Int
 requestsPerEndpoint extractor = foldl' aggregate M.empty
   where
@@ -128,10 +117,7 @@ requestsPerEndpoint extractor = foldl' aggregate M.empty
         Just endpoint -> M.insertWith (+) endpoint 1 acc
 
 -- | Bucket error logs into fixed-size time intervals
--- Returns list of (bucket_start_time, error_count) sorted by time
--- 
--- >>> errorsOverTime 3600 entries  -- hourly buckets
--- [(2025-01-01 00:00:00, 5), (2025-01-01 01:00:00, 12), ...]
+
 errorsOverTime :: NominalDiffTime -> [LogEntry] -> [(UTCTime, Int)]
 errorsOverTime interval entries =
   sortOn fst
@@ -151,9 +137,7 @@ errorsOverTime interval entries =
 
 -- | Group logs by IP into sessions
 -- A session ends when the time gap between consecutive logs exceeds the timeout
--- 
--- >>> sessionize 1800 entries  -- 30-minute session timeout
--- [[entry1, entry2], [entry3], ...]  -- grouped sessions
+
 sessionize :: NominalDiffTime -> [LogEntry] -> [[LogEntry]]
 sessionize timeout entries =
   -- Process each IP's entries with parallel evaluation strategy
@@ -192,11 +176,7 @@ sessionize timeout entries =
         go [] _ = []  -- Should never happen, but for completeness
 
 -- | Basic anomaly detection
--- Identifies:
---   - IPs with unusually high total traffic (threshold = 100 requests)
---   - IPs with high error counts (threshold = 10 errors)
--- 
--- Returns a list of descriptive messages about detected anomalies
+
 computeAnomalies :: [LogEntry] -> [String]
 computeAnomalies entries =
   highTrafficAnomalies ++ highErrorAnomalies
