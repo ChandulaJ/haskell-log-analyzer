@@ -77,6 +77,7 @@ test-suite server-log-analyzer-test
   other-modules:
       ParserSpec
       ProcessingSpec
+      TestHelpers
       UtilsSpec
       Paths_server_log_analyzer
   hs-source-dirs:
