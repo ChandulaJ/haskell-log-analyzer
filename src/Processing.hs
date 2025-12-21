@@ -21,6 +21,8 @@ import Data.Ord (Down(..), comparing)
 import Data.Time (UTCTime, NominalDiffTime, diffUTCTime)
 import Control.Parallel.Strategies (using, rseq, parBuffer)
 import Control.DeepSeq (NFData(..))
+import Data.Text (Text)
+import qualified Data.Text as T
 
 import DataTypes (LogEntry(..), isError, StatusCategory(..), statusCategory)
 import Utils (bucketTime)
@@ -29,7 +31,7 @@ import Utils (bucketTime)
 data AnalysisResult = AnalysisResult
   { arTotalLines     :: !Int                       -- ^ Total number of log entries
   , arByLevel        :: !(Map StatusCategory Int) -- ^ Count by status category
-  , arTopIPs         :: ![(String, Int)]          -- ^ Top IPs by request count
+  , arTopIPs         :: ![(Text, Int)]            -- ^ Top IPs by request count
   , arErrorsOverTime :: ![(UTCTime, Int)]         -- ^ Error counts per time bucket
   } deriving (Show, Eq)
 
@@ -50,39 +52,28 @@ countByLevel = foldl' countEntry M.empty
       in M.insertWith (+) category 1 acc
 
 -- | Return the top N IPs sorted by descending request count
-topIPs :: Int -> [LogEntry] -> [(String, Int)]
+topIPs :: Int -> [LogEntry] -> [(Text, Int)]
 topIPs n entries =
   take n
   . sortBy (comparing (Down . snd))
   . M.toList
   $ ipCounts
   where
-    ipCounts :: Map String Int
+    ipCounts :: Map Text Int
     ipCounts = foldl' countIP M.empty entries
     
     countIP !acc entry = M.insertWith (+) (leIpAddress entry) 1 acc
 
 -- | Filter entries by path prefix (case-insensitive)
-filterByService :: String -> [LogEntry] -> [LogEntry]
+filterByService :: Text -> [LogEntry] -> [LogEntry]
 filterByService servicePath = filter matchesService
   where
-    lowerService = map toLower servicePath
+    lowerService = T.toLower servicePath
     matchesService entry = 
-      lowerService `isPrefixOfCI` lePath entry
-    
-    -- Case-insensitive prefix check
-    isPrefixOfCI :: String -> String -> Bool
-    isPrefixOfCI prefix str = 
-      map toLower (take (length prefix) str) == prefix
-    
-    -- Simple toLower for ASCII
-    toLower :: Char -> Char
-    toLower c
-      | c >= 'A' && c <= 'Z' = toEnum (fromEnum c + 32)
-      | otherwise = c
+      lowerService `T.isPrefixOf` T.toLower (lePath entry)
 
 -- | Generic aggregator for counting endpoints extracted by a function
-requestsPerEndpoint :: (LogEntry -> Maybe String) -> [LogEntry] -> Map String Int
+requestsPerEndpoint :: (LogEntry -> Maybe Text) -> [LogEntry] -> Map Text Int
 requestsPerEndpoint extractor = foldl' aggregate M.empty
   where
     aggregate !acc entry =
@@ -160,13 +151,13 @@ computeAnomalies entries =
     errorThreshold = 10
     
     -- Count total requests per IP
-    ipCounts :: Map String Int
+    ipCounts :: Map Text Int
     ipCounts = foldl' countIP M.empty entries
       where
         countIP !acc entry = M.insertWith (+) (leIpAddress entry) 1 acc
     
     -- Count errors per IP
-    ipErrorCounts :: Map String Int
+    ipErrorCounts :: Map Text Int
     ipErrorCounts = foldl' countError M.empty entries
       where
         countError !acc entry
@@ -177,7 +168,7 @@ computeAnomalies entries =
     -- Detect high traffic anomalies
     highTrafficAnomalies :: [String]
     highTrafficAnomalies =
-      [ "High traffic from IP " ++ ip ++ ": " ++ show count ++ " requests"
+      [ "High traffic from IP " ++ T.unpack ip ++ ": " ++ show count ++ " requests"
       | (ip, count) <- M.toList ipCounts
       , count > trafficThreshold
       ]
@@ -185,7 +176,7 @@ computeAnomalies entries =
     -- Detect high error rate anomalies
     highErrorAnomalies :: [String]
     highErrorAnomalies =
-      [ "High error rate from IP " ++ ip ++ ": " ++ show count ++ " errors"
+      [ "High error rate from IP " ++ T.unpack ip ++ ": " ++ show count ++ " errors"
       | (ip, count) <- M.toList ipErrorCounts
       , count > errorThreshold
       ]

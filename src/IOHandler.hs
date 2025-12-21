@@ -9,6 +9,7 @@ import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as M
 import Data.Time (UTCTime)
 import Text.Printf (printf)
+import qualified Data.Text as T
 
 -- Import your data types
 import DataTypes (StatusCategory(..))
@@ -43,7 +44,7 @@ writeReport result successCount failCount = do
     printMap (arByLevel result)
     
     putStrLn "\nTop 10 IP Addresses:"
-    mapM_ (\(ip, count) -> printf "  %-15s : %d requests\n" ip count) (arTopIPs result)
+    mapM_ (\(ip, count) -> printf "  %-15s : %d requests\n" (T.unpack ip) count) (arTopIPs result)
     
     putStrLn "\nError Distribution (Hourly Buckets):"
     if null (arErrorsOverTime result)

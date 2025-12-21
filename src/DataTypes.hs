@@ -11,6 +11,7 @@ module DataTypes
 
 import Data.Time (UTCTime)
 import Control.DeepSeq (NFData(..))
+import Data.Text (Text)
 -- Data types for log analyzer
 
 -- 54.36.149.41 - - [22/Jan/2019:03:56:14 +0330] "GET /filter/27|13%20%D9%85%DA%AF%D8%A7%D9%BE%DB%8C%DA%A9%D8%B3%D9%84,27|%DA%A9%D9%85%D8%AA%D8%B1%20%D8%A7%D8%B2%205%20%D9%85%DA%AF%D8%A7%D9%BE%DB%8C%DA%A9%D8%B3%D9%84,p53 HTTP/1.1" 200 30577 "-" "Mozilla/5.0 (compatible; AhrefsBot/6.1; +http://ahrefs.com/robot/)" "-"
@@ -21,15 +22,15 @@ import Control.DeepSeq (NFData(..))
 -- Log format: IP - - [timestamp] "METHOD path HTTP/version" status size "referer" "user-agent" "other"
 
 data LogEntry = LogEntry
-  { leIpAddress :: String,
-   leTimestamp :: UTCTime,
-   leMethod :: HttpMethod,
-   lePath :: String,
-   leHttpVersion :: String,
-   leStatusCode :: Int,
-   leResponseSize :: Int,
-   leReferrer :: String,
-   leUserAgent :: String
+  { leIpAddress :: !Text,
+   leTimestamp :: !UTCTime,
+   leMethod :: !HttpMethod,
+   lePath :: !Text,
+   leHttpVersion :: !Text,
+   leStatusCode :: !Int,
+   leResponseSize :: !Int,
+   leReferrer :: !Text,
+   leUserAgent :: !Text
   } deriving (Show, Eq)
 
 data HttpMethod 
@@ -45,14 +46,14 @@ data HttpMethod
 
 -- Analysis results
 data LogStats = LogStats
-  { lsTotalRequests :: Int,
-   lsMethodDistribution :: [(HttpMethod, Int)],
-   lsStatusDistribution :: [(Int, Int)],
-   lsTopPaths :: [(String, Int)],
-   lsTopIPs :: [(String, Int)],
-   lsErrorRate :: Double,
-   lsTotalBandwidth :: Integer,
-   lsAvgResponseSize :: Double
+  { lsTotalRequests :: !Int,
+   lsMethodDistribution :: ![(HttpMethod, Int)],
+   lsStatusDistribution :: ![(Int, Int)],
+   lsTopPaths :: ![(Text, Int)],
+   lsTopIPs :: ![(Text, Int)],
+   lsErrorRate :: !Double,
+   lsTotalBandwidth :: !Integer,
+   lsAvgResponseSize :: !Double
   } deriving (Show)
 
 data TimeWindow = Hourly | Daily deriving (Show, Eq)
@@ -84,14 +85,36 @@ data BotType
   = GoogleBot
   | BingBot
   | AhrefsBot
-  | OtherBot String
+  | OtherBot !Text
   | Browser
   deriving (Show, Eq, Ord)
 
--- | NFData instance for parallel evaluation of StatusCategory
+-- | NFData instances for parallel evaluation
 instance NFData StatusCategory where
   rnf Success     = ()
   rnf Redirection = ()
   rnf ClientError = ()
   rnf ServerError = ()
   rnf Other       = ()
+
+instance NFData HttpMethod where
+  rnf GET = ()
+  rnf POST = ()
+  rnf PUT = ()
+  rnf DELETE = ()
+  rnf HEAD = ()
+  rnf OPTIONS = ()
+  rnf PATCH = ()
+  rnf (UNKNOWN t) = rnf t
+
+instance NFData BotType where
+  rnf GoogleBot = ()
+  rnf BingBot = ()
+  rnf AhrefsBot = ()
+  rnf (OtherBot t) = rnf t
+  rnf Browser = ()
+
+instance NFData LogEntry where
+  rnf (LogEntry ip ts meth path ver stat sz ref ua) = 
+    rnf ip `seq` rnf ts `seq` rnf meth `seq` rnf path `seq` 
+    rnf ver `seq` rnf stat `seq` rnf sz `seq` rnf ref `seq` rnf ua

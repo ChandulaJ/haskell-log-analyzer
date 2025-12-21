@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Parser 
   ( parseLogLine
   , parseLogFile
@@ -13,14 +15,15 @@ module Parser
 import DataTypes
 import Data.Time (UTCTime, parseTimeM, defaultTimeLocale)
 import Text.Regex.TDFA ((=~))
-import Data.List (isPrefixOf)
 import Data.Char (isSpace)
+import Data.Text (Text)
+import qualified Data.Text as T
 
 -- | Parse a single log line in Apache Combined Log Format
 -- Format: IP - - [timestamp] "METHOD path HTTP/version" status size "referer" "user-agent" "other"
 parseLogLine :: String -> Maybe LogEntry
 parseLogLine line = do
-  let pattern = "^([^ ]+) - - \\[([^]]+)\\] \"([A-Z]+) ([^ ]+) HTTP/([0-9.]+)\" ([0-9]+) ([0-9]+) \"([^\"]+)\" \"([^\"]+)\""
+  let pattern = "^([^ ]+) - - \\[([^]]+)\\] \"([A-Z]+) ([^ ]+) HTTP/([0-9.]+)\" ([0-9]+) ([0-9]+) \"([^\"]+)\" \"([^\"]+)\"" :: String
   let match = line =~ pattern :: [[String]]
   
   case match of
@@ -31,15 +34,15 @@ parseLogLine line = do
       size <- readMaybe sizeStr
       
       return LogEntry
-        { leIpAddress = ip
+        { leIpAddress = T.pack ip
         , leTimestamp = timestamp
         , leMethod = method
-        , lePath = path
-        , leHttpVersion = httpVer
+        , lePath = T.pack path
+        , leHttpVersion = T.pack httpVer
         , leStatusCode = status
         , leResponseSize = size
-        , leReferrer = if referer == "-" then "" else referer
-        , leUserAgent = userAgent
+        , leReferrer = if referer == "-" then T.empty else T.pack referer
+        , leUserAgent = T.pack userAgent
         }
     _ -> Nothing
 
@@ -68,24 +71,18 @@ parseTimestamp timeStr =
   parseTimeM True defaultTimeLocale "%d/%b/%Y:%H:%M:%S %z" timeStr
 
 -- | Classify user agent into bot types
-classifyBot :: String -> BotType
+classifyBot :: Text -> BotType
 classifyBot ua
-  | "Googlebot" `isPrefixOf` ua || "Google" `isInfixOf` ua = GoogleBot
-  | "bingbot" `isInfixOf` ua || "BingPreview" `isInfixOf` ua = BingBot
-  | "AhrefsBot" `isInfixOf` ua = AhrefsBot
-  | "bot" `isInfixOf` lowerUA || "crawler" `isInfixOf` lowerUA || 
-    "spider" `isInfixOf` lowerUA = OtherBot ua
+  | "Googlebot" `T.isPrefixOf` ua || "Google" `T.isInfixOf` ua = GoogleBot
+  | "bingbot" `T.isInfixOf` ua || "BingPreview" `T.isInfixOf` ua = BingBot
+  | "AhrefsBot" `T.isInfixOf` ua = AhrefsBot
+  | "bot" `T.isInfixOf` lowerUA || "crawler" `T.isInfixOf` lowerUA || 
+    "spider" `T.isInfixOf` lowerUA = OtherBot ua
   | otherwise = Browser
   where
-    lowerUA = map toLower ua
-    toLower c = if c >= 'A' && c <= 'Z' then toEnum (fromEnum c + 32) else c
+    lowerUA = T.toLower ua
 
--- | Helper to check if substring exists in string (case insensitive)
-isInfixOf :: String -> String -> Bool
-isInfixOf needle haystack = any (isPrefixOf needle) (tails haystack)
-  where
-    tails [] = [[]]
-    tails xs@(_:xs') = xs : tails xs'
+
 
 -- | Safe read with Maybe
 readMaybe :: Read a => String -> Maybe a
@@ -105,36 +102,28 @@ parseLogFileWithStats content =
   in (entries, successCount, failedCount)
 
 -- | Extract domain from URL path
-extractDomain :: String -> String
+extractDomain :: Text -> Text
 extractDomain url
-  | "http://" `isPrefixOf` url = takeWhile (/= '/') $ drop 7 url
-  | "https://" `isPrefixOf` url = takeWhile (/= '/') $ drop 8 url
-  | otherwise = ""
+  | "http://" `T.isPrefixOf` url = T.takeWhile (/= '/') $ T.drop 7 url
+  | "https://" `T.isPrefixOf` url = T.takeWhile (/= '/') $ T.drop 8 url
+  | otherwise = T.empty
 
 -- | Extract query parameters from path
-extractQueryParams :: String -> [(String, String)]
+extractQueryParams :: Text -> [(Text, Text)]
 extractQueryParams path =
-  case break (== '?') path of
-    (_, "") -> []
-    (_, _:query) -> parseParams query
+  case T.break (== '?') path of
+    (_, t) | T.null t -> []
+    (_, query) -> parseParams (T.tail query)
   where
-    parseParams q = map splitParam (splitOn '&' q)
-    splitParam p = case break (== '=') p of
-      (k, "") -> (k, "")
-      (k, _:v) -> (k, v)
-    splitOn _ [] = []
-    splitOn c s = case break (== c) s of
-      (chunk, []) -> [chunk]
-      (chunk, _:rest) -> chunk : splitOn c rest
+    parseParams q = map splitParam (T.splitOn "&" q)
+    splitParam p = case T.break (== '=') p of
+      (k, v) | T.null v -> (k, T.empty)
+      (k, v) -> (k, T.tail v)
 
 -- | Check if request is for a static resource
-isStaticResource :: String -> Bool
+isStaticResource :: Text -> Bool
 isStaticResource path =
-  any (`isSuffixOf` path) staticExtensions
+  any (`T.isSuffixOf` path) staticExtensions
   where
     staticExtensions = [".jpg", ".jpeg", ".png", ".gif", ".css", ".js", 
                        ".ico", ".svg", ".woff", ".woff2", ".ttf", ".eot"]
-    isSuffixOf suffix str = 
-      let lenS = length suffix
-          lenStr = length str
-      in lenStr >= lenS && drop (lenStr - lenS) str == suffix
