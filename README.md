@@ -4,11 +4,12 @@
 
 ## Project Information
 
-**Project Title:** Enterprise Server Log Analyzer using Functional Programming  
-**Course:** Functional Programming Mini Project  
+**Project Title:** Enterprise Server Log Analyzer using Functional Programming
+**Course:** Functional Programming Mini Project
 **Technology Stack:** Haskell (GHC 9.x), Stack
 
 ### Group Members
+
 - EG/2020/3990 - Jayasooriya LPM
 - EG/2020/3994 - Jayathilake HACP
 - EG/2020/3996 - Jayawardhana MVTI
@@ -16,23 +17,30 @@
 
 ---
 
+## [YouTube Demo](https://youtu.be/S7JR83tjYH4)
+
 ## Problem Description
 
 ### Real-World Scenario
+
 In modern web infrastructure, servers generate **millions of log entries daily**. These logs contain critical information about:
+
 - Traffic patterns and user behavior
 - Security threats (DDoS attacks, bot traffic)
 - System errors and performance bottlenecks
 - Resource utilization and bandwidth consumption
 
 **Industrial Challenge:** Traditional log analysis tools often struggle with:
+
 - Processing large volumes of data efficiently
 - Maintaining data integrity during concurrent operations
 - Providing reliable, reproducible results
 - Ensuring code maintainability and testability
 
 ### Our Solution
+
 We built a **pure functional log analyzer** in Haskell that demonstrates how FP principles solve these challenges through:
+
 - **Purity & Immutability:** Predictable transformations with no side effects
 - **Parallel Processing:** Safe concurrent computation without race conditions
 - **Type Safety:** Compile-time guarantees preventing runtime errors
@@ -43,6 +51,7 @@ We built a **pure functional log analyzer** in Haskell that demonstrates how FP 
 ## Quick Start
 
 ### Prerequisites
+
 ```bash
 # Install Stack (Haskell build tool)
 curl -sSL https://get.haskellstack.org/ | sh
@@ -52,6 +61,7 @@ brew install haskell-stack
 ```
 
 ### Installation & Execution
+
 ```bash
 # 1. Clone or navigate to the project directory
 cd haskell-log-analyzer
@@ -70,6 +80,7 @@ stack exec server-log-analyzer-exe
 ```
 
 ### Alternative: Using GHCi (Interactive)
+
 ```bash
 stack ghci
 
@@ -83,10 +94,12 @@ main
 
 ---
 
-##  Sample Input/Output
+## Sample Input/Output
 
 ### Sample Input Format
+
 The analyzer processes **Apache/Nginx Combined Log Format**:
+
 ```
 54.36.149.41 - - [22/Jan/2019:03:56:14 +0330] "GET /filter/test HTTP/1.1" 200 30577 "-" "Mozilla/5.0 (compatible; AhrefsBot/6.1)" "-"
 31.56.96.51 - - [22/Jan/2019:03:56:16 +0330] "GET /image/60844/productModel/200x200 HTTP/1.1" 200 5667 "https://www.zanbil.ir/m/filter/b113" "Mozilla/5.0 (Linux; Android 6.0)" "-"
@@ -94,6 +107,7 @@ The analyzer processes **Apache/Nginx Combined Log Format**:
 ```
 
 ### Sample Output
+
 ```
 --- Haskell Log Analyzer ---
 Enter path to log file (e.g., access.log): data/sample.log
@@ -162,7 +176,9 @@ haskell-log-analyzer/
 ## Functional Programming Concepts Demonstrated
 
 ### 1. **Pure Functions**
+
 All data transformations are pure (no side effects):
+
 ```haskell
 -- Parser.hs: Pure transformation from String to structured data
 parseLogLine :: String -> Maybe LogEntry
@@ -172,12 +188,15 @@ parseLogLine line = do
   method <- parseMethod methodStr
   return LogEntry {...}
 ```
+
 **Benefit:** Predictable, testable, and cacheable results.
 
 ---
 
 ### 2. **Algebraic Data Types (ADTs)**
+
 Strong type system models domain precisely:
+
 ```haskell
 -- DataTypes.hs: Sum type for HTTP methods
 data HttpMethod 
@@ -195,12 +214,15 @@ data LogEntry = LogEntry
   -- ... more fields
   } deriving (Show, Eq)
 ```
+
 **Benefit:** Compile-time validation prevents invalid states.
 
 ---
 
 ### 3. **Higher-Order Functions**
+
 Functions as first-class values enable composition:
+
 ```haskell
 -- Processing.hs: Generic aggregator accepting a function
 requestsPerEndpoint :: (LogEntry -> Maybe String) -> [LogEntry] -> Map String Int
@@ -210,12 +232,15 @@ requestsPerEndpoint extractor = foldl' aggregate M.empty
       Just endpoint -> M.insertWith (+) endpoint 1 acc
       Nothing -> acc
 ```
+
 **Benefit:** Reusable abstractions reduce code duplication.
 
 ---
 
 ### 4. **Recursion & Tail Recursion**
+
 Natural iteration through recursive patterns:
+
 ```haskell
 -- Processing.hs: Session splitting using recursion
 splitSessions :: [LogEntry] -> [[LogEntry]]
@@ -229,24 +254,30 @@ splitSessions (x:xs) = go [x] xs
       where
         gap = diffUTCTime (leTimestamp next) (leTimestamp latest)
 ```
+
 **Benefit:** Clear logic without mutable loop variables.
 
 ---
 
 ### 5. **Lazy Evaluation**
+
 Process infinite or large datasets efficiently:
+
 ```haskell
 -- Parser.hs: Only parses lines as needed
 parseLogFile :: String -> [LogEntry]
 parseLogFile content = 
   [entry | Just entry <- map parseLogLine (lines content)]
 ```
+
 **Benefit:** Memory-efficient streaming of large log files.
 
 ---
 
 ### 6. **Immutability**
+
 No mutable state ensures thread safety:
+
 ```haskell
 -- Processing.hs: Building result without mutation
 countByLevel :: [LogEntry] -> Map StatusCategory Int
@@ -256,24 +287,30 @@ countByLevel = foldl' countEntry M.empty
       let category = statusCategory (leStatusCode entry)
       in M.insertWith (+) category 1 acc  -- Creates new map
 ```
+
 **Benefit:** Eliminates entire class of concurrency bugs.
 
 ---
 
 ### 7. **Parallel & Concurrent Processing**
+
 Safe parallelism without locks:
+
 ```haskell
 -- Processing.hs: Parallel session processing
 sessionize :: NominalDiffTime -> [LogEntry] -> [[LogEntry]]
 sessionize timeout entries =
   concatMap sessionizeIP groupedByIP `using` parBuffer 100 rseq
 ```
+
 **Benefit:** Automatic parallelization with referential transparency.
 
 ---
 
 ### 8. **Monads (Maybe, IO)**
+
 Composable error handling and effect management:
+
 ```haskell
 -- Parser.hs: Chaining fallible operations with Maybe monad
 parseLogLine line = do
@@ -282,12 +319,15 @@ parseLogLine line = do
   status <- readMaybe statusStr
   return LogEntry {...}
 ```
+
 **Benefit:** Eliminates null pointer exceptions and exception handling clutter.
 
 ---
 
 ### 9. **Functional Pipeline Architecture**
+
 Separation of concerns (IO boundary vs pure logic):
+
 ```haskell
 -- Main.hs: Clear data flow pipeline
 main :: IO ()
@@ -301,18 +341,22 @@ main = do
   
   writeReport result                   -- IO: Output
 ```
+
 **Benefit:** Testable core logic isolated from effects.
 
 ---
 
 ### 10. **Type-Driven Development**
+
 Type signatures as documentation:
+
 ```haskell
 -- Processing.hs: Self-documenting function signatures
 topIPs :: Int -> [LogEntry] -> [(String, Int)]
 errorsOverTime :: NominalDiffTime -> [LogEntry] -> [(UTCTime, Int)]
 sessionize :: NominalDiffTime -> [LogEntry] -> [[LogEntry]]
 ```
+
 **Benefit:** Compiler enforces correctness; types guide implementation.
 
 ---
@@ -320,21 +364,25 @@ sessionize :: NominalDiffTime -> [LogEntry] -> [[LogEntry]]
 ## Industrial Relevance
 
 ### DevOps & Site Reliability Engineering (SRE)
+
 - **Real-time monitoring:** Detect traffic spikes, error patterns, and anomalies
 - **Capacity planning:** Analyze bandwidth usage and resource consumption
 - **Incident response:** Quick identification of error sources and affected IPs
 
 ### Security & Threat Detection
+
 - **DDoS Detection:** Identify abnormal traffic patterns from specific IPs
 - **Bot Classification:** Distinguish between legitimate crawlers and malicious bots
 - **Attack Pattern Analysis:** Track 404 errors indicating scanning attempts
 
 ### Business Intelligence
+
 - **User Behavior:** Analyze popular endpoints and referrer sources
 - **Performance Metrics:** Response size distribution and error rates
 - **Traffic Trends:** Hourly/daily patterns for infrastructure optimization
 
 ### Why Functional Programming Wins Here
+
 1. **Reliability:** Pure functions guarantee reproducible reports for compliance
 2. **Concurrency:** Process millions of logs in parallel without race conditions
 3. **Correctness:** Type system prevents entire categories of bugs
@@ -357,6 +405,7 @@ stack test --coverage
 ```
 
 **Test Coverage:**
+
 - Unit tests for parsing functions
 - Property-based tests with QuickCheck
 - Integration tests with real log samples
@@ -366,6 +415,7 @@ stack test --coverage
 ## Dependencies
 
 Core libraries used:
+
 - `time` - Date/time parsing and manipulation
 - `containers` - Efficient Map and Set implementations
 - `regex-tdfa` - Regular expression matching for parsing
