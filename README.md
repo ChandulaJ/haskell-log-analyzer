@@ -17,7 +17,7 @@
 
 ---
 
-## [YouTube Demo]([https://](https://youtu.be/S7JR83tjYH4)https://)
+## [YouTube Demo](https://youtu.be/S7JR83tjYH4)
 
 ## Problem Description
 
